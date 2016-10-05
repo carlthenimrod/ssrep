@@ -59,7 +59,6 @@ class rep extends CI_Model{
 				'lat'        => $post['country_lat'],
 				'lng'        => $post['country_lng'],
 			);
-
 			//save
 			$country_id = $this->country->save($data);
 		}
@@ -118,6 +117,8 @@ class rep extends CI_Model{
 
 		//if groups, implode, add to data array
 		if( $this->input->post('groups_save') ){
+
+		exit();
 
 			if( $post['groups'] ){
 

@@ -50,7 +50,7 @@ $(function(){
 					//create map, center on USA
 					map = new google.maps.Map(document.getElementById("sr-map"), {
 
-						center: new google.maps.LatLng(38.555474, -95.664999),
+						center: new google.maps.LatLng(-38.555474, -63.664999),
 						zoom: 4,
 						mapTypeId: google.maps.MapTypeId.ROADMAP
 					});
@@ -230,60 +230,64 @@ $(function(){
 				option,
 				i, l, x, y;
 
-			//create location menu
-			$locationMenu = $('<section />', { class: 'sr-select-location' });
+			//if locations exist
+			if( locations ){
 
-			//for each location create an option
-			for(i = 0, l = locations.length; i < l; ++i){
+				//create location menu
+				$locationMenu = $('<section />', { class: 'sr-select-location' });
 
-				//skip if not correct id
-				if( locations[i].country_id != selectedCountry.id ) continue;
+				//for each location create an option
+				for(i = 0, l = locations.length; i < l; ++i){
 
-				//add to selected array
-				selected.push( locations[i] );
-			}
+					//skip if not correct id
+					if( locations[i].country_id != selectedCountry.id ) continue;
 
-			//if we have locations selected, create menu
-			if( selected.length > 1 ){
-
-				//create location dropdown
-				select = $('<select />', { class: 'sr-locations' });
-
-				//for each selected
-				for(x = 0, y = selected.length; x < y; ++x){
-
-					//create option
-					option = $('<option />', {
-						html: selected[x].long_name,
-						value: selected[x].id
-					});
-
-					//append option to select element
-					select.append(option);
+					//add to selected array
+					selected.push( locations[i] );
 				}
 
-				//create default option
-				option = $('<option />', {
-					html: '--- Select a Location ---',
-					selected: 'selected',
-					value: '0'
-				})
-				.prependTo( select );
+				//if we have locations selected, create menu
+				if( selected.length > 1 ){
 
-				//bind event
-				select.on('change', locationChange);
+					//create location dropdown
+					select = $('<select />', { class: 'sr-locations' });
 
-				//append select to location menu
-				$locationMenu.append( select );
+					//for each selected
+					for(x = 0, y = selected.length; x < y; ++x){
 
-				//append location menu to container
-				$selectMenu.append( $locationMenu );
+						//create option
+						option = $('<option />', {
+							html: selected[x].long_name,
+							value: selected[x].id
+						});
 
-				//initialize chosen plugin
-				select.chosen({ 
-					disable_search_threshold: 10,
-					width: '100%'
-				});
+						//append option to select element
+						select.append(option);
+					}
+
+					//create default option
+					option = $('<option />', {
+						html: '--- Select a Location ---',
+						selected: 'selected',
+						value: '0'
+					})
+					.prependTo( select );
+
+					//bind event
+					select.on('change', locationChange);
+
+					//append select to location menu
+					$locationMenu.append( select );
+
+					//append location menu to container
+					$selectMenu.append( $locationMenu );
+
+					//initialize chosen plugin
+					select.chosen({ 
+						disable_search_threshold: 10,
+						width: '100%'
+					});
+				}
 			}
 		};
 
@@ -294,63 +298,67 @@ $(function(){
 				option,
 				i, l, x, l;
 
-			//remove existing menu
-			$locationMenu.empty();
+			//if locations exist
+			if( locations ){
 
-			//no location selected
-			selectedLocation = false;
+				//remove existing menu
+				$locationMenu.empty();
 
-			//for each location create an option
-			for(i = 0, l = locations.length; i < l; ++i){
+				//no location selected
+				selectedLocation = false;
 
-				//skip if not correct id
-				if( locations[i].country_id != selectedCountry.id ) continue;
+				//for each location create an option
+				for(i = 0, l = locations.length; i < l; ++i){
 
-				//add to selected array
-				selected.push( locations[i] );
-			}
+					//skip if not correct id
+					if( locations[i].country_id != selectedCountry.id ) continue;
 
-			//if we have locations selected, create menu
-			if( selected.length > 1 ){
-
-				//create location dropdown
-				select = $('<select />', { class: 'sr-locations' });
-
-				//for each selected
-				for(x = 0, y = selected.length; x < y; ++x){
-
-					//create option
-					option = $('<option />', {
-						html: selected[x].long_name,
-						value: selected[x].id
-					});
-
-					//append option to select element
-					select.append(option);
+					//add to selected array
+					selected.push( locations[i] );
 				}
 
-				//create default option
-				option = $('<option />', {
-					html: '--- Select a Location ---',
-					selected: 'selected',
-					value: '0'
-				})
-				.prependTo( select );
+				//if we have locations selected, create menu
+				if( selected.length > 1 ){
 
-				//bind event
-				select.on('change', locationChange);
+					//create location dropdown
+					select = $('<select />', { class: 'sr-locations' });
 
-				//append select to location menu
-				$locationMenu.append( select );
+					//for each selected
+					for(x = 0, y = selected.length; x < y; ++x){
 
-				//append location menu to container
-				$selectMenu.append( $locationMenu );
+						//create option
+						option = $('<option />', {
+							html: selected[x].long_name,
+							value: selected[x].id
+						});
 
-				//initialize chosen plugin
-				select.chosen({ 
-					disable_search_threshold: 10,
-					width: '100%'
-				});
+						//append option to select element
+						select.append(option);
+					}
+
+					//create default option
+					option = $('<option />', {
+						html: '--- Select a Location ---',
+						selected: 'selected',
+						value: '0'
+					})
+					.prependTo( select );
+
+					//bind event
+					select.on('change', locationChange);
+
+					//append select to location menu
+					$locationMenu.append( select );
+
+					//append location menu to container
+					$selectMenu.append( $locationMenu );
+
+					//initialize chosen plugin
+					select.chosen({ 
+						disable_search_threshold: 10,
+						width: '100%'
+					});
+				}
 			}
 		};
 

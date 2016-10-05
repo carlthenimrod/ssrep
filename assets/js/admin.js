@@ -573,47 +573,50 @@ $(function(){
 			//get reps
 			reps = map.sr.reps;
 
-			for(i = 0, l = reps.length; i < l; ++i){
+			if( reps ){
 
-				location = new google.maps.LatLng(reps[i].lat, reps[i].lng);
+				for(i = 0, l = reps.length; i < l; ++i){
 
-				//create marker
-				marker = new google.maps.Marker({
-					map: map,
-	    			draggable: true,
-					position: location
-				});
+					location = new google.maps.LatLng(reps[i].lat, reps[i].lng);
 
-				//set attributes
-				marker.attr = {
+					//create marker
+					marker = new google.maps.Marker({
+						map: map,
+		    			draggable: true,
+						position: location
+					});
 
-					'id' : reps[i].id,
-					'name' : reps[i].name,
-					'address' : reps[i].address,
-					'state' : reps[i].state,
-					'city' : reps[i].city,
-					'zip' : reps[i].zip,
-					'company' : reps[i].company,
-					'phone' : reps[i].phone,
-					'cell' : reps[i].cell,
-					'fax' : reps[i].fax,
-					'email' : reps[i].email,
-					'web' : reps[i].web,
-					'lat' : reps[i].lat,
-					'lng' : reps[i].lng
+					//set attributes
+					marker.attr = {
+
+						'id' : reps[i].id,
+						'name' : reps[i].name,
+						'address' : reps[i].address,
+						'state' : reps[i].state,
+						'city' : reps[i].city,
+						'zip' : reps[i].zip,
+						'company' : reps[i].company,
+						'phone' : reps[i].phone,
+						'cell' : reps[i].cell,
+						'fax' : reps[i].fax,
+						'email' : reps[i].email,
+						'web' : reps[i].web,
+						'lat' : reps[i].lat,
+						'lng' : reps[i].lng
+					}
+
+					//add groups if enabled
+					if(options.groups){
+
+						marker.attr.groups = reps[i].groups;
+					}
+
+					//add click event
+					google.maps.event.addListener(marker, 'click', markerClick);
+
+					//add to markers array
+					map.sr.markers.push(marker);
 				}
-
-				//add groups if enabled
-				if(options.groups){
-
-					marker.attr.groups = reps[i].groups;
-				}
-
-				//add click event
-				google.maps.event.addListener(marker, 'click', markerClick);
-
-				//add to markers array
-				map.sr.markers.push(marker);
 			}
 		};
 

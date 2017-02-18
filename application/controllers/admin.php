@@ -67,7 +67,23 @@ class Admin extends CI_Controller{
 
 	function geolocator(){
 
-		$this->load->view('admin/geolocator');
+		//get admin options
+		$options = $this->option->get();
+
+		//if tags supported, get tags
+		if( $options->tags ){
+
+			$tags = $this->tag->all();
+		}
+
+		//create data
+		$data = array();
+
+		$data['options'] = $options;
+		$data['tags']	 = $tags;
+
+		//load view
+		$this->load->view('admin/geolocator', $data);
 	}
 
 	function groups(){
@@ -83,6 +99,21 @@ class Admin extends CI_Controller{
 		$data['groups'] = $this->group->all();
 
 		$this->load->view('admin/groups', $data);
+	}
+
+	function tags(){
+
+		//get admin options
+		$options = $this->option->get();
+
+		//if tags aren't enabled, return to admin
+		if( !$options->tags ) redirect('admin');
+
+		$data = array();
+
+		$data['tags'] = $this->tag->all();
+
+		$this->load->view('admin/tags', $data);
 	}
 
 	function settings(){

@@ -10,6 +10,12 @@
 					<a href="#" data-tab="groups" title="Groups">Groups</a>
 				</li>
 			<?php endif; ?>
+
+			<?php if( $options->tags ) : ?>
+				<li>
+					<a href="#" data-tab="tags" title="Tags">Tags</a>
+				</li>
+			<?php endif; ?>
 		</ul>
 	</nav>
 

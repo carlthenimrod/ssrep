@@ -40,6 +40,10 @@
 
 						<input type="textfield" id="sr-name" /><!-- #sr-name -->
 
+						<label for="sr-company" class="sr-company">Company:</label>
+
+						<input type="textfield" id="sr-company" /><!-- #sr-company -->
+
 						<label for="sr-address" class="sr-address">Address:</label>
 
 						<input type="textfield" id="sr-address" /><!-- #sr-address -->
@@ -58,9 +62,6 @@
 					</div>
 
 					<div>
-						<label for="sr-company" class="sr-company">Company:</label>
-
-						<input type="textfield" id="sr-company" /><!-- #sr-company -->
 
 						<label for="sr-phone">Phone:</label>
 

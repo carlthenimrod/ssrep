@@ -35,6 +35,7 @@ $(function(){
 
 				//set options to int
 				options.groups = parseInt( options.groups, 10 );
+				options.tags   = parseInt( options.tags, 10 );
 
 				//load geolocator by default
 				loadGeolocator();
@@ -81,6 +82,10 @@ $(function(){
 
 				case "groups" :
 				loadGroups();
+				break;
+
+				case "tags" :
+				loadTags();
 				break;
 
 				case "settings" :
@@ -471,6 +476,370 @@ $(function(){
 			}
 		};
 
+		// Tags
+		//////////////////////
+		var loadTags = function(){
+
+			//load view
+			$.ajax('admin/tags').done(function(html){
+
+				//empty all from admin - remove loader
+				$admin.find('section').empty();
+
+				//append html
+				$admin.find('section').append(html);
+
+				//events
+				$('#sr-create form').on('submit', newTag);
+				$('#sr-manage').on('change', '.sr-tag-default', saveTagDefault);
+				$('#sr-manage').on('click', '.sr-edit', editTag);
+				$('#sr-manage').on('click', '.sr-delete', deleteTag);
+			});
+		};
+
+		var newTag = function(e){
+
+			var $this = $(this),
+				data = {};
+
+			//get name
+			data.name = $this.find('#sr-tag-name').val().trim();
+
+			//find if default is checked
+			if( $this.find('#sr-default').is(':checked') ){
+
+				data.default = 1;
+			}
+			else{
+
+				data.default = 0;
+			}
+
+			//save tag
+			$.ajax({
+
+				data: data,
+				type: 'POST',
+				url: 'tags/save'
+			})
+			.done(function(result){
+
+				var $table,
+					$tr,
+					$td,
+					$label,
+					$input,
+					$img,
+					$errors;
+
+				if( result.id ){
+
+					//remove any existing errors
+					$('#sr-errors').remove();
+
+					//remove no tags message
+					$('#sr-manage').find('p').remove();
+
+					//check if table exists
+					if( $('#sr-manage table').length > 0 ){
+
+						$table = $('#sr-manage table');
+					}
+					else{
+
+						//create table
+						$table = $('<table />').appendTo( '#sr-manage' );
+
+						//create table row
+						$tr = $('<tr />').appendTo( $table );
+
+						//create table headers
+						$('<th />', { colspan: '2' })
+						.html('Tag Name')
+						.appendTo( $tr );
+
+						$('<th />', { colspan: '2' })
+						.html('Default')
+						.appendTo( $tr );
+					}
+
+					//create row, add id, append to table
+					$tr = $('<tr />',{
+						class: 'sr-tag'
+					})
+					.data( 'id', result.id )
+					.insertAfter( $table.find('tr').first() );
+
+					//create td, add tag name
+					$td = $('<td />')
+					.html( '<span>' + data.name + '</span>')
+					.appendTo( $tr );
+
+					//create edit
+					$img = $('<img />', {
+						alt: 'Edit',
+						class: 'sr-edit',
+						src: 'assets/img/edit.png',
+						title: 'Edit'
+					})
+					.appendTo( $td );
+
+					//create label for checkbox
+					$label = $('<label />', {
+						for: 'sr-tag-default',
+						html: 'Default: '
+					});
+
+					//create checkbox
+					$input = $('<input />', {
+
+						id: 'sr-tag-default',
+						name: 'sr-tag-default',
+						type: 'checkbox'
+					});
+
+					//check if necessary
+					if( data.default ){
+
+						$input.prop('checked', true);
+					}
+
+					//add default checkbox
+					$td = $('<td />').append( $label, $input ).appendTo( $tr );
+
+					//add save icon
+					$td = $('<td />').prepend('<span>Saved!</span>').appendTo( $tr );
+
+					//create save
+					$img = $('<img />', {
+						alt: 'Saved!',
+						src: 'assets/img/save.png',
+						title: 'Saved!'
+					})
+					.appendTo( $td );
+
+					//add actions
+					$td = $('<td />').appendTo( $tr );
+
+					//create delete
+					$img = $('<img />', {
+						alt: 'Delete',
+						class: 'sr-delete',
+						src: 'assets/img/delete.png',
+						title: 'Delete'
+					})
+					.appendTo( $td );
+
+					//fade saved message
+					$tr.find('td:nth-child(3)')
+					.children()
+					.delay( 2000 )
+					.fadeOut( 500 );
+				}
+				else if( result.errors ){
+
+					//remove any existing errors
+					$('#sr-errors').remove();
+
+					//create errors div
+					$errors = $('<div />', { 
+						html: result.errors,
+						id: 'sr-errors' });
+
+					//insert errors
+					$errors.insertAfter('#sr-create')
+
+					//animate, remove
+					$errors.delay(2000).slideUp(200, function(){
+
+						//remove
+						$errors.remove();
+					});
+
+					//fade text out
+					$errors.find('p').delay(2000).animate({ opacity: 0 }, 100);
+				}
+			});
+
+			e.preventDefault();
+		};
+
+		var saveTagDefault = function(){
+
+			var $parent,
+				data = {};
+
+			//get parent
+			$parent = $(this).parents('tr');
+
+			//set data
+			data.id = $parent.data('id');
+
+			//get checked status
+			data.checked = ( $(this).prop('checked') ) ? 1 : 0;
+
+			//save default
+			$.ajax({
+				data: data,
+				type: 'POST',
+				url: 'tags/save_default'
+			})
+			.done(function(r){
+
+				var $td,
+					$img;
+
+				if(r){ //if success
+
+					//create save image
+					$img = $('<img />', {
+						alt: 'Saved!',
+						src: 'assets/img/save.png',
+						title: 'Saved!'
+					});
+
+					//get third td
+					$td = $parent.find('td').eq(2).empty();
+
+					//append save message, fade message
+					$td
+					.append('<span>Saved!</span>', $img)
+					.children()
+					.delay( 2000 )
+					.fadeOut( 500 );
+				}
+			});
+		}
+		
+		var editTag = function(){
+
+			var data = {},
+				name,
+				$input,
+				$parent,
+				$td,
+				$img;
+
+			//get parent
+			$parent = $(this).parents('tr');
+
+			//find td
+			$td = $parent.find('td').eq(0);
+
+			//get current name
+			name = $td.find('span').html().trim();
+
+			//create input box
+			$input = $('<input />', {
+				class: 'sr-save-name',
+				value: name
+			});
+
+			//empty td
+			$td.empty();
+
+			//append input box
+			$td.append( $input );
+
+			//focus on input box
+			$input.focus();
+
+			$input.keypress(function(e){
+
+				if(e.which == 13){
+
+					data.id = $parent.data('id');
+					data.name = $input.val();
+
+					$.ajax({
+						data: data,
+						type: 'POST',
+						url: 'tags/save_name'
+					})
+					.done(function(r){
+
+						if(r){ //if success
+
+							//add tag name
+							$td.html( '<span>' + data.name + '</span>');
+
+							//create edit
+							$img = $('<img />', {
+								alt: 'Edit',
+								class: 'sr-edit',
+								src: 'assets/img/edit.png',
+								title: 'Edit'
+							})
+							.appendTo( $td );
+
+							//create save image
+							$img = $('<img />', {
+								alt: 'Saved!',
+								src: 'assets/img/save.png',
+								title: 'Saved!'
+							});
+
+							//get third td
+							$td = $parent.find('td').eq(2).empty();
+
+							//append save message, fade message
+							$td
+							.append('<span>Saved!</span>', $img)
+							.children()
+							.delay( 2000 )
+							.fadeOut( 500 );
+						}
+						else{ //reset
+
+							//add tag name
+							$td.html( '<span>' + name + '</span>');
+
+							//create edit
+							$img = $('<img />', {
+								alt: 'Edit',
+								class: 'sr-edit',
+								src: 'assets/img/edit.png',
+								title: 'Edit'
+							})
+							.appendTo( $td );
+						}
+					});
+				}
+			});
+		};
+
+		var deleteTag = function(){
+
+			var $parent,
+				name,
+				data = {},
+				id;
+
+			//get parent
+			$parent = $(this).parents('tr');
+
+			//get info
+			id   = $parent.data('id');
+			name = $parent.find('td').first().html().trim();
+
+			//store id in data object
+			data.id = id;
+
+			if( confirm('Are you sure you want to delete the ' + name + ' tag?') ){
+
+				$.ajax({
+					data: data,
+					type: 'POST',
+					url: 'tags/delete'
+				})
+				.done(function(r){
+
+					//if complete, remove from list
+					if(r) $parent.remove();
+				});
+			}
+		};
+
 		// Geolocator
 		//////////////////////
 		var loadGeolocator = function(){
@@ -524,7 +893,7 @@ $(function(){
 						$div = $('<div />', {
 							class: 'sr-rep-groups'
 						})
-						.appendTo('.sr-rep-info div:first-child');
+						.appendTo('.sr-rep-info > div:first-child');
 
 						$label = $('<label />').html('Groups: ').appendTo( $div );
 
@@ -547,7 +916,49 @@ $(function(){
 						}
 
 						//add chosen plugin
-						map.sr.chosen = $select.chosen({ width: '45%' });
+						map.sr.selectGroup = $select.chosen({ width: '45%' });
+					});
+
+					//get tags
+					if(options.tags) $.ajax('tags/all').done(function(tags){ 
+
+						var $div,
+							$label,
+							$select,
+							$option,
+							i, l;
+
+						//save tags
+						map.sr.tags = tags;
+
+						//create dropdown
+						$div = $('<div />', {
+							class: 'sr-rep-tags'
+						})
+						.appendTo('.sr-rep-info > div:last-child');
+
+						$label = $('<label />').html('Tags: ').appendTo( $div );
+
+						$select = $('<select />')
+						.prop('multiple', 'multiple')
+						.attr('data-placeholder', 'Click to Assign a Tag...')
+						.appendTo( $div );
+
+						//create options for dropdown
+						for( i = 0, l = tags.length; i < l; ++i){
+
+							//create option tag
+							$option = $('<option />', {
+								html: tags[i].name,
+								value: tags[i].id
+							});
+
+							//add option
+							$option.appendTo( $select );
+						}
+
+						//add chosen plugin
+						map.sr.selectTag = $select.chosen({ width: '45%' });
 					});
 
 					//create markers
@@ -611,6 +1022,12 @@ $(function(){
 						marker.attr.groups = reps[i].groups;
 					}
 
+					//add tags if enabled
+					if(options.tags){
+
+						marker.attr.tags = reps[i].tags;
+					}
+
 					//add click event
 					google.maps.event.addListener(marker, 'click', markerClick);
 
@@ -646,6 +1063,7 @@ $(function(){
 			var editBox = $('.sr-edit-info'),
 				children = editBox.children(),
 				groups,
+				tags,
 				i, l;
 
 			//clear inputs
@@ -685,9 +1103,6 @@ $(function(){
 
 						}
 					}
-					
-					//update chosen plugin
-					map.sr.chosen.trigger('chosen:updated');
 				}
 				else{ //load defaults
 
@@ -702,9 +1117,41 @@ $(function(){
 
 							$('.sr-rep-groups').find('option[value="' +  groups[i].id + '"]').prop('selected', true);
 						}
+					}
+				}
+			}
 
-						//update chosen plugin
-						map.sr.chosen.trigger('chosen:updated');
+			//if tags are enabled and we have tags, select necessary options
+			if( options.tags ){
+
+				if( typeof obj.tags !=='undefined' ){
+
+					//deselect all options
+					$('.sr-rep-tags').find('option').prop('selected', false);
+
+					if(obj.tags){
+
+						//select options
+						for(i = 0, l = obj.tags.length; i < l; ++i){
+
+							$('.sr-rep-tags').find('option[value="' +  obj.tags[i] + '"]').prop('selected', true);
+
+						}
+					}
+				}
+				else{ //load defaults
+
+					//set tags
+					tags = map.sr.tags;
+
+					//select options
+					for(i = 0, l = tags.length; i < l; ++i){
+
+						//if a default group
+						if( parseInt( tags[i].default, 10 ) ){
+
+							$('.sr-rep-tags').find('option[value="' +  tags[i].id + '"]').prop('selected', true);
+						}
 					}
 				}
 			}
@@ -734,6 +1181,10 @@ $(function(){
 					'opacity' : '1'
 				}, 200);
 			});
+
+			//update select menus
+			map.sr.selectGroup.trigger('chosen:updated');
+			map.sr.selectTag.trigger('chosen:updated');
 		};
 
 		var hideInfoBox = function(){
@@ -1084,6 +1535,7 @@ $(function(){
 				id      = $(this).find('input#sr-id').val(),
 				save    = $(this).find('input#sr-save').val(),
 				groups,
+				tags,
 				lat,
 				lng,
 				data,
@@ -1170,6 +1622,17 @@ $(function(){
 				data.groups_save = true;
 			}
 
+			//if tags are enabled, get tags
+			if( options.tags ){
+
+				//get multi-select values
+				tags = $(this).find('.sr-rep-tags select').val();
+
+				//add to data object
+				data.tags      = tags;
+				data.tags_save = true;
+			}
+
 			if(loading) return;
 
 			//now loading
@@ -1226,6 +1689,13 @@ $(function(){
 						marker.attr.groups = data.groups;
 					}
 
+					//if tags are enabled, set tags for marker
+					if( options.tags ){
+
+						//add to data object
+						marker.attr.tags = data.tags;
+					}
+
 					marker.setIcon(null);
 
 					google.maps.event.addListener(marker, 'click', markerClick);
@@ -1275,6 +1745,13 @@ $(function(){
 							marker.attr.groups = data.groups;
 						}
 
+						//if tags are enabled, set tags for marker
+						if( options.tags ){
+
+							//add to data object
+							marker.attr.tags = data.tags;
+						}
+
 						map.sr.markers.push(marker);
 
 						//not loading
@@ -1296,7 +1773,8 @@ $(function(){
 
 		var resetRep = function(e){
 
-			var groups;
+			var groups,
+				tags;
 
 			//reset input boxes
 			$(this).find('input').val('');
@@ -1317,6 +1795,29 @@ $(function(){
 					if( parseInt( groups[i].default, 10 ) ){
 
 						$('.sr-rep-groups').find('option[value="' +  groups[i].id + '"]').prop('selected', true);
+					}
+
+					//update chosen plugin
+					map.sr.chosen.trigger('chosen:updated');
+				}
+			}
+
+			//if tags are enabled, set back to default
+			if( options.tags ){
+
+				//set tags
+				tags = map.sr.tags;
+
+				//deselect all options
+				$('.sr-rep-tags').find('option').prop('selected', false);
+
+				//select options
+				for(i = 0, l = tags.length; i < l; ++i){
+
+					//if a default group
+					if( parseInt( tags[i].default, 10 ) ){
+
+						$('.sr-rep-tags').find('option[value="' +  tags[i].id + '"]').prop('selected', true);
 					}
 
 					//update chosen plugin

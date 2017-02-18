@@ -36,6 +36,11 @@ class rep extends CI_Model{
 
 					$r->groups = explode('*', $r->groups );
 				}
+
+				if( !is_null($r->tags) ){
+
+					$r->tags = explode('*', $r->tags );
+				}
 			}
 
 			$json->reps = $result;
@@ -118,7 +123,7 @@ class rep extends CI_Model{
 		//if groups, implode, add to data array
 		if( $this->input->post('groups_save') ){
 
-		exit();
+			exit();
 
 			if( $post['groups'] ){
 
@@ -127,6 +132,21 @@ class rep extends CI_Model{
 			else{
 
 				$data['groups'] = NULL;
+			}
+		}
+
+		//if tags, implode, add to data array
+		if( $this->input->post('tags_save') ){
+
+			exit();
+
+			if( $post['tags'] ){
+
+				$data['tags'] = implode( '*', $post['tags'] );
+			}
+			else{
+
+				$data['tags'] = NULL;
 			}
 		}
 
@@ -168,6 +188,19 @@ class rep extends CI_Model{
 			else{
 
 				$data['groups'] = NULL;
+			}
+		}
+
+		//if tags, implode, add to data array
+		if( $this->input->post('tags_save') ){
+
+			if( $post['tags'] ){
+
+				$data['tags'] = implode( '*', $post['tags'] );
+			}
+			else{
+
+				$data['tags'] = NULL;
 			}
 		}
 

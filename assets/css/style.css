@@ -4,9 +4,14 @@
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
+html, body{
+	height: 100%;
+	width: 100%;
+}
 body{
 	margin: 0 auto;
 	padding: 0;
+	position: relative;
 }
 img{
 	border: none;
@@ -277,8 +282,29 @@ section#sr-reps-info .sr-rep a:hover{
 	width: 100%;
 	z-index: 9999;
 }
+#sr-admin .sr-edit-info .sr-extra{
+	position: absolute;
+	bottom: 8px;
+	left: 10px;
+	width: 60%;
+}
+#sr-admin .sr-edit-info .sr-extra div{
+	display: inline-block;
+}
+#sr-admin .sr-edit-info .sr-extra label{
+	font-size: 13px;
+	line-height: 20px;
+	padding: 0 5px 0 20px;
+}
+#sr-admin .sr-edit-info .sr-extra .chosen-container-multi .chosen-choices{
+	border: 1px solid #ddd;
+	background: #fafafa;
+	height: 29px;
+	line-height: 27px;
+}
 #sr-admin .sr-edit-info .sr-rep-info{
 	display: table;
+	position: relative;
 	width: 100%;
 }
 #sr-admin .sr-edit-info .sr-rep-info > div{
@@ -295,6 +321,24 @@ section#sr-reps-info .sr-rep a:hover{
 	white-space: nowrap;
 	width: 20%;
 }
+#sr-admin .sr-edit-info .sr-rep-info button#sr-image{
+	border: 1px solid #ddd;
+	background: #fafafa url(../img/upload.png) 10px center no-repeat;
+	color: #000;
+	display: inline-block;
+	float: right;
+	font-weight: bold;
+	height: 30px;
+	line-height: 30px;
+	margin: 4px 35px 4px 0;
+	padding: 0 15px 0 35px;
+	width: auto;
+}
+#sr-admin .sr-edit-info .sr-rep-info button#sr-image:focus,
+#sr-admin .sr-edit-info .sr-rep-info button#sr-image:hover{
+    background-color: #fff;
+	border: 1px solid #fff;
+}
 #sr-admin .sr-edit-info .sr-rep-info input[type="textfield"]{
 	border: 1px solid #ccc;
 	background-color: #ddd;
@@ -305,47 +349,13 @@ section#sr-reps-info .sr-rep a:hover{
 	padding: 0 5px;
 	width: 75%;
 }
-#sr-admin .sr-edit-info .sr-rep-groups{
-	padding: 2px 0 0 0;
-}
-#sr-admin .sr-edit-info .sr-rep-groups label{
-	color: #000;
-	display: inline-block;
-	font-size: 13px;
-	line-height: 20px;
-	margin: 4px 3px 4px 0;
-	padding: 0 15px 0 0;
-	text-align: right;
-	white-space: nowrap;
-	width: 20%;
-}
-#sr-admin .sr-edit-info .sr-rep-groups select{
-	text-align: left;
-}
-#sr-admin .sr-edit-info .sr-rep-groups .chosen-container-multi .chosen-choices{
-	border: 1px solid #ccc;
-	background: #ddd;
-}
-#sr-admin .sr-edit-info .sr-rep-tags{
-	padding: 2px 0 0 0;
-}
-#sr-admin .sr-edit-info .sr-rep-tags label{
-	color: #000;
-	display: inline-block;
-	font-size: 13px;
-	line-height: 20px;
-	margin: 4px 3px 4px 0;
-	padding: 0 15px 0 0;
-	text-align: right;
-	white-space: nowrap;
-	width: 20%;
-}
-#sr-admin .sr-edit-info .sr-rep-tags select{
-	text-align: left;
-}
-#sr-admin .sr-edit-info .sr-rep-tags .chosen-container-multi .chosen-choices{
-	border: 1px solid #ccc;
-	background: #ddd;
+#sr-admin .sr-edit-info .sr-rep-info input[type="file"]{
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	width: 0.1px;
+	z-index: -1;
 }
 #sr-admin .sr-edit-info .sr-btns{
 	clear: both;
@@ -357,9 +367,12 @@ section#sr-reps-info .sr-rep a:hover{
 }
 #sr-admin .sr-loading{
 	display: none;
-	position: absolute;
-	bottom: 10px;
-	left: 50px;
+	padding: 0 10px 0 0;
+	position: relative;
+}
+#sr-admin .sr-loading img{
+	position: relative;
+	top: 4px;
 }
 
 /** Message Window **/
@@ -379,6 +392,132 @@ section#sr-reps-info .sr-rep a:hover{
 	text-align: center;
 	width: 100%;
 	z-index: 9999;
+}
+
+/*** Image Select ***/
+#sr-lightbox{
+	background-color: rgba(255, 255, 255, 0.8);
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	z-index: 99999;
+}
+article#sr-image-select{
+	background-color: #fff;
+	border-radius: 10px;
+	-webkit-box-shadow: 1px 1px 7px 0px rgba(0,0,0,0.23);
+	-moz-box-shadow: 1px 1px 7px 0px rgba(0,0,0,0.23);
+	box-shadow: 1px 1px 7px 0px rgba(0,0,0,0.23);
+	margin: 50px auto 0 auto;
+	padding: 20px;
+	position: relative;
+	width: 800px;
+}
+article#sr-image-select a#sr-close{
+	color: #000;
+	font-size: 14px;
+	font-weight: bold;
+	position: absolute;
+	top: 10px;
+	right: 20px;
+	text-decoration: none;
+}
+article#sr-image-select h1{
+	font-size: 20px;
+	margin: 0;
+	padding: 10px 0 40px 0;
+	text-align: center;
+}
+article#sr-image-select form{
+	font-size: 14px;
+	padding: 0 0 0 20px;
+}
+article#sr-image-select form input{
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+article#sr-image-select form input + label {
+	border: 1px solid #ddd;
+	background: #fafafa url(../img/upload.png) 10px center no-repeat;
+	color: #000;
+	cursor: pointer;
+	display: inline-block;
+	font-weight: bold;
+	height: 30px;
+	line-height: 30px;
+	margin: 0;
+	padding: 0 15px 0 35px;
+	width: auto;
+}
+article#sr-image-select:focus form input + label,
+article#sr-image-select form input + label:hover{
+    background-color: #eee;
+	border: 1px solid #ddd;
+}
+article#sr-image-select ul#sr-images{
+	background-color: #fafafa;
+	border: 1px solid #ddd;
+	border-collapse: separate;
+    border-spacing: 10px;
+	color: #aaa;
+	display: block;
+	list-style: none;
+	margin: 10px 0 0 0;
+	overflow-y: scroll;
+	height: 600px;
+	padding: 40px;
+	text-align: center;
+	width: 100%;
+}
+article#sr-image-select ul#sr-images li{
+	display: table;
+	width: 100%;
+}
+article#sr-image-select ul#sr-images li div{
+	background-color: #eee;
+	border: 1px solid #ccc;
+	display: table-cell;
+	height: 200px;
+	padding: 0 40px;
+	position: relative;
+	vertical-align: middle;
+	width: 50%;
+}
+article#sr-image-select ul#sr-images li div.sr-empty{
+	background: none;
+	border: none;
+}
+article#sr-image-select ul#sr-images li div a#sr-delete{
+	color: #333;
+	font-size: 14px;
+	position: absolute;
+	top: 5px;
+	right: 10px;
+	text-decoration: none;
+}
+article#sr-image-select ul#sr-images li div img{
+	-webkit-box-shadow: 1px 1px 7px 0px rgba(0,0,0,0.5);
+	-moz-box-shadow: 1px 1px 7px 0px rgba(0,0,0,0.5);
+	box-shadow: 1px 1px 7px 0px rgba(0,0,0,0.5);
+	border: 3px solid #eee;
+	cursor: pointer;
+	max-height: 180px;
+	width: 100%;
+}
+article#sr-image-select ul#sr-images li div img:hover{
+	border-color: #f4df42;
+}
+article#sr-image-select ul#sr-images li div img#sr-selected{
+	border-color: #0dd !important;
+}
+article#sr-image-select ul#sr-images p{
+	padding: 30px;
 }
 
 /*** Groups ***/

@@ -82,14 +82,18 @@
 						<label for="sr-web">Web:</label>
 
 						<input type="textfield" id="sr-web" /><!-- #sr-web -->
+
+						<button type="button" id="sr-image">Select Image...</button><!-- #sr-image -->
 					</div>
 				</div>
 
-				<div class="sr-loading">
-					<img src="<?= base_url(); ?>assets/img/ajax-loader.gif" />
-				</div><!-- .sr-loading -->
+				<div class="sr-extra"></div><!-- .sr-extra -->
 
 				<div class="sr-btns">
+					<div class="sr-loading">
+						<img src="<?= base_url(); ?>assets/img/ajax-loader.gif" />
+					</div><!-- .sr-loading -->
+
 					<button type="button" name="hide" class="sr-hide">Hide</button><!-- .sr-hide -->
 
 					<button type="button" name="delete" class="sr-delete">Delete</button><!-- .sr-delete -->
@@ -102,6 +106,8 @@
 				<input type="hidden" id="sr-save" value="1" />
 
 				<input type="hidden" id="sr-id" />
+
+				<input type="hidden" id="sr-img" />
 			</form>
 		</div><!-- .sr-edit-info -->
 

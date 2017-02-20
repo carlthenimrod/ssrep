@@ -23,11 +23,11 @@ class group extends CI_Model{
 		}
 	}
 
-	function get($name){
+	function get($id){
 
 		$this->db->select('*');
-		$this->db->from('group');
-		$this->db->where('LOWER(name)', strtolower($name));
+		$this->db->from('img');
+		$this->db->where('id', $id);
 
 		$query = $this->db->get();
 

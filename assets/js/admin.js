@@ -42,6 +42,9 @@ $(function(){
 
 				//change tab on click
 				$admin.find('nav li a').on('click', changeTab);
+
+				//select image popup
+				$admin.on('click', 'button#sr-image', selectImage);
 			});
 		}
 
@@ -95,6 +98,125 @@ $(function(){
 
 			//add active to tab
 			$this.addClass('active');
+
+			e.preventDefault();
+		};
+
+		var selectImage = function(e){
+
+			$.ajax({
+
+				data: { id: $('input#sr-img').val() },
+				type: 'POST',
+				url: 'images/'
+			})
+			.done(function(popup){
+
+				var $popup = $(popup);
+
+				$('body').prepend( $popup );
+
+				//file upload select
+				$popup.find('input[type="file"]').on('change', function(e){ 
+
+					$popup.find('#sr-form').submit();
+
+					e.preventDefault();
+				});
+
+				//file upload save
+				$popup.find('#sr-form').on('submit', function(e){
+
+					var fd = new FormData( document.getElementById('sr-form') );
+
+					$.ajax({
+						url : 'images/save',
+						type : 'POST',
+						data : fd,
+						dataType : 'json',
+						contentType : false,
+        				cache : false,
+        				processData : false,
+					})
+					.done(function( result ){
+
+						if( 'success' in result ){
+
+							//remove
+							$popup.remove();
+
+							//store img info
+							$('button#sr-image').html( result.img.file_name );
+							$('#sr-img').val( result.id );
+						}
+						else{
+
+							//post error
+
+						}
+					});
+
+					e.preventDefault();
+				});
+
+				//remove popup
+				$popup.find('a#sr-close').on('click', function(e){
+
+					$popup.remove();
+
+					e.preventDefault();
+				});
+
+				//select image
+				$popup.find('ul#sr-images img').on('click', function(e){
+
+					var $this = $(this),
+						$img;
+
+					//get img
+					$img = $this.parent('div').find('img');
+
+					//store img info
+					$('button#sr-image').html( $img.data('file') );
+					$('#sr-img').val( $img.data('img') );
+
+					$popup.remove();
+
+					e.preventDefault();
+				});
+
+				//delete image
+				$popup.find('ul#sr-images a#sr-delete').on('click', function(e){
+
+					var $this = $(this),
+						$img,
+						data = {},
+						selected;
+
+					confirm('Are you sure you want to delete this image?');
+
+					//get img
+					$img = $this.parent('div').find('img');
+
+					//get data
+					data.img  = $img.data('img');
+					data.file = $img.data('file');
+
+					$.ajax({
+						url : 'images/delete',
+						type : 'POST',
+						data : data
+					})
+					.done(function(popup){
+
+						//store img info
+						$('button#sr-image').html( 'Select Image...' );
+						$('#sr-img').val('');
+					});
+
+					e.preventDefault();
+				});
+			});
 
 			e.preventDefault();
 		};
@@ -663,53 +785,6 @@ $(function(){
 
 			e.preventDefault();
 		};
-
-		var saveTagDefault = function(){
-
-			var $parent,
-				data = {};
-
-			//get parent
-			$parent = $(this).parents('tr');
-
-			//set data
-			data.id = $parent.data('id');
-
-			//get checked status
-			data.checked = ( $(this).prop('checked') ) ? 1 : 0;
-
-			//save default
-			$.ajax({
-				data: data,
-				type: 'POST',
-				url: 'tags/save_default'
-			})
-			.done(function(r){
-
-				var $td,
-					$img;
-
-				if(r){ //if success
-
-					//create save image
-					$img = $('<img />', {
-						alt: 'Saved!',
-						src: 'assets/img/save.png',
-						title: 'Saved!'
-					});
-
-					//get third td
-					$td = $parent.find('td').eq(2).empty();
-
-					//append save message, fade message
-					$td
-					.append('<span>Saved!</span>', $img)
-					.children()
-					.delay( 2000 )
-					.fadeOut( 500 );
-				}
-			});
-		}
 		
 		var editTag = function(){
 
@@ -893,7 +968,7 @@ $(function(){
 						$div = $('<div />', {
 							class: 'sr-rep-groups'
 						})
-						.appendTo('.sr-rep-info > div:first-child');
+						.appendTo( $('.sr-extra') );
 
 						$label = $('<label />').html('Groups: ').appendTo( $div );
 
@@ -916,7 +991,7 @@ $(function(){
 						}
 
 						//add chosen plugin
-						map.sr.selectGroup = $select.chosen({ width: '45%' });
+						map.sr.selectGroup = $select.chosen({ width: '180px' });
 					});
 
 					//get tags
@@ -935,7 +1010,7 @@ $(function(){
 						$div = $('<div />', {
 							class: 'sr-rep-tags'
 						})
-						.appendTo('.sr-rep-info > div:last-child');
+						.appendTo( $('.sr-extra') );
 
 						$label = $('<label />').html('Tags: ').appendTo( $div );
 
@@ -958,7 +1033,7 @@ $(function(){
 						}
 
 						//add chosen plugin
-						map.sr.selectTag = $select.chosen({ width: '45%' });
+						map.sr.selectTag = $select.chosen({ width: '180px' });
 					});
 
 					//create markers
@@ -1012,6 +1087,7 @@ $(function(){
 						'fax' : reps[i].fax,
 						'email' : reps[i].email,
 						'web' : reps[i].web,
+						'img' : reps[i].img,
 						'lat' : reps[i].lat,
 						'lng' : reps[i].lng
 					}
@@ -1026,6 +1102,12 @@ $(function(){
 					if(options.tags){
 
 						marker.attr.tags = reps[i].tags;
+					}
+
+					//check if has image, add file name
+					if( reps[i].img ){
+
+						marker.attr.img_file =  reps[i].img_file;
 					}
 
 					//add click event
@@ -1086,13 +1168,26 @@ $(function(){
 			//if id is set, set save var to 1 else 0, indicates to update and not create new record
 			(obj.id) ? editBox.find('#sr-save').val(0) : editBox.find('#sr-save').val(1);
 
+			//if has image
+			if( obj.img ){
+				
+				editBox.find('button#sr-image').html(obj.img_file);
+				editBox.find('#sr-img').val(obj.img);
+			}
+			else{
+				
+				editBox.find('button#sr-image').html('Select Image...');
+				editBox.find('#sr-img').val(0);
+			}
+
+
 			//if groups are enabled and we have groups, select necessary options
 			if( options.groups ){
 
-				if( typeof obj.groups !=='undefined' ){
+				//deselect all options
+				$('.sr-rep-groups').find('option').prop('selected', false);
 
-					//deselect all options
-					$('.sr-rep-groups').find('option').prop('selected', false);
+				if( typeof obj.groups !=='undefined' ){
 
 					if(obj.groups){
 
@@ -1119,15 +1214,17 @@ $(function(){
 						}
 					}
 				}
+				
+				map.sr.selectGroup.trigger('chosen:updated');
 			}
 
 			//if tags are enabled and we have tags, select necessary options
 			if( options.tags ){
 
-				if( typeof obj.tags !=='undefined' ){
+				//deselect all options
+				$('.sr-rep-tags').find('option').prop('selected', false);
 
-					//deselect all options
-					$('.sr-rep-tags').find('option').prop('selected', false);
+				if( typeof obj.tags !=='undefined' ){
 
 					if(obj.tags){
 
@@ -1154,6 +1251,8 @@ $(function(){
 						}
 					}
 				}
+				
+				map.sr.selectTag.trigger('chosen:updated');
 			}
 
 			//if editBox is open, just return
@@ -1181,10 +1280,6 @@ $(function(){
 					'opacity' : '1'
 				}, 200);
 			});
-
-			//update select menus
-			map.sr.selectGroup.trigger('chosen:updated');
-			map.sr.selectTag.trigger('chosen:updated');
 		};
 
 		var hideInfoBox = function(){
@@ -1532,6 +1627,7 @@ $(function(){
 				fax     = $(this).find('input#sr-fax').val(),
 				email   = $(this).find('input#sr-email').val(),
 				web     = $(this).find('input#sr-web').val(),
+				img     = $(this).find('input#sr-img').val(),
 				id      = $(this).find('input#sr-id').val(),
 				save    = $(this).find('input#sr-save').val(),
 				groups,
@@ -1559,6 +1655,7 @@ $(function(){
 				'fax' : fax.trim(),
 				'email' : email.trim(),
 				'web' : web.trim(),
+				'img' : img,
 				'lat' : lat,
 				'lng' : lng,
 				'save' : save
@@ -1638,7 +1735,7 @@ $(function(){
 			//now loading
 			loading = true;
 			
-			$('.sr-loading').css('display', 'block');
+			$('.sr-loading').css('display', 'inline-block');
 
 			//do ajax
 			$.ajax({
@@ -1678,8 +1775,15 @@ $(function(){
 						'fax' : data.fax,
 						'email' : data.email,
 						'web' : data.web,
+						'img' : data.img,
 						'lat' : data.lat,
 						'lng' : data.lng
+					}
+
+					//if image selected
+					if( data.img ){
+
+						marker.attr.img_file = $(this).find('button#sr-image').html();
 					}
 
 					//if groups are enabled, set groups for marker
@@ -1734,8 +1838,15 @@ $(function(){
 							'fax' : data.fax,
 							'email' : data.email,
 							'web' : data.web,
+							'img' : data.img,
 							'lat' : data.lat,
 							'lng' : data.lng
+						}
+
+						//if image selected
+						if( data.img ){
+
+							marker.attr.img_file = $(this).find('button#sr-image').html();
 						}
 
 						//if groups are enabled, set groups for marker
@@ -1798,7 +1909,7 @@ $(function(){
 					}
 
 					//update chosen plugin
-					map.sr.chosen.trigger('chosen:updated');
+					map.sr.selectGroup.trigger('chosen:updated');
 				}
 			}
 
@@ -1821,7 +1932,7 @@ $(function(){
 					}
 
 					//update chosen plugin
-					map.sr.chosen.trigger('chosen:updated');
+					map.sr.selectTag.trigger('chosen:updated');
 				}
 			}
 
@@ -1848,7 +1959,7 @@ $(function(){
 
 					//now loading
 					loading = true;
-					$('.sr-loading').css('display', 'block');
+					$('.sr-loading').css('display', 'inline-block');
 
 					//create data to send
 					data = { id: map.sr.activeMarker.attr.id };
@@ -1856,10 +1967,10 @@ $(function(){
 					//do ajax, remove from DB
 					$.ajax({
 
-						'data' : data,
-						'dataType' : 'json',
-						'type' : 'POST',
-						'url' : 'admin/delete/'
+						data : data,
+						dataType : 'json',
+						type : 'POST',
+						url : 'admin/delete/'
 
 					}).then(function(data){
 

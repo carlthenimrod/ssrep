@@ -8,6 +8,7 @@ class rep extends CI_Model{
 
 		$this->load->model('country');
 		$this->load->model('location');
+		$this->load->model('image');
     }
 
 	function all(){
@@ -40,6 +41,19 @@ class rep extends CI_Model{
 				if( !is_null($r->tags) ){
 
 					$r->tags = explode('*', $r->tags );
+				}
+
+				if( !is_null($r->img) ){
+
+					//get image
+					$img = $this->image->get( $r->img );
+
+					//if image found
+					if( $img ){
+
+						//store file name
+						$r->img_file = $img->file;
+					}
 				}
 			}
 
@@ -116,14 +130,13 @@ class rep extends CI_Model{
 			'fax'         => $post['fax'],
 			'email'       => $post['email'],
 			'web'         => $post['web'],
+			'img'         => $post['img'],
 			'lat'         => $post['lat'],
 			'lng'         => $post['lng']
 		);
 
 		//if groups, implode, add to data array
 		if( $this->input->post('groups_save') ){
-
-			exit();
 
 			if( $post['groups'] ){
 
@@ -137,8 +150,6 @@ class rep extends CI_Model{
 
 		//if tags, implode, add to data array
 		if( $this->input->post('tags_save') ){
-
-			exit();
 
 			if( $post['tags'] ){
 
@@ -174,6 +185,7 @@ class rep extends CI_Model{
 			'fax'     => $post['fax'],
 			'email'   => $post['email'],
 			'web'     => $post['web'],
+			'img'     => $post['img'],
 			'lat'     => $post['lat'],
 			'lng'     => $post['lng']
 		);

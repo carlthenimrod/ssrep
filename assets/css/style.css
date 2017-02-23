@@ -47,6 +47,10 @@ img{
 #sr-map .sr-rep a:hover{
 	text-decoration: none;
 }
+#sr-map .sr-rep a.sr-img{
+	display: none;
+}
+}
 
 /*** Locator ***/
 section#sr-locator{
@@ -79,6 +83,24 @@ section#sr-locator .sr-select-menu .sr-select-location{
 section#sr-locator .sr-select-menu .sr-select-location ul li{
 	background-image: none;
 }
+/** Tags **/
+section#sr-locator .sr-select-menu .sr-select-tags{
+	display: inline-block;
+	float: right;
+	font-size: 14px;
+	font-style: italic;
+	padding: 0 0 0 100px;
+}
+section#sr-locator .sr-select-menu .sr-select-tags label{
+	display: inline-block;
+	padding: 0 10px 0 0;
+}
+section#sr-locator .sr-select-menu .sr-select-tags div{
+	display: inline-block;
+	padding: 0 10px 0 0;
+	width: 200px;
+}
+
 
 /*** Rep Info ***/
 section#sr-reps-info{
@@ -111,7 +133,6 @@ section#sr-reps-info .sr-rep{
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e5e5e5',GradientType=0 ); /* IE6-9 */
 	border: 1px solid #ccc;
 	border-radius: 5px;
-	cursor: pointer;
 	display: inline-block;
 	font-size: 12px;
 	line-height: 21px;
@@ -142,6 +163,10 @@ section#sr-reps-info .sr-rep a{
 }
 section#sr-reps-info .sr-rep a:hover{
 	text-decoration: none;
+}
+section#sr-reps-info .sr-rep img{
+	cursor: pointer;
+	width: 100%;
 }
 
 /***** Admin *****

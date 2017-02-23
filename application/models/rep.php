@@ -24,7 +24,11 @@ class rep extends CI_Model{
 		if( $locations ) $json->locations = $locations;
 
 		//get reps
-		$query = $this->db->get('rep');
+		$this->db->select('r.*, i.file');
+		$this->db->from('rep AS r');
+		$this->db->join('img AS i', 'r.img = i.id', 'left');
+
+		$query = $this->db->get();
 
 		//if results
 		if( $query->num_rows() > 0 ){

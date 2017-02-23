@@ -13,11 +13,14 @@ $(function(){
 			$selectMenu,
 			$countryMenu,
 			$locationMenu,
+			$tagsMenu,
+			$tagsSelect,
 			selectedCountry = false,
 			selectedLocation = false,
 			markers = [],
 			countries = false,
 			locations = false,
+			tags = false,
 			reps = false;
 
 		// Intialize
@@ -32,6 +35,7 @@ $(function(){
 
 				//set options to int
 				options.groups = parseInt( options.groups, 10 );
+				options.tags   = parseInt( options.tags, 10 );
 
 				//ajax on load, retrieve all db records
 				$.ajax({
@@ -109,6 +113,9 @@ $(function(){
 			//create sub menus
 			createCountryMenu();
 			createLocationMenu();
+
+			//if tags are enabled
+			if( options.tags ) createTagsMenu();
 
 			//append select menu to locator
 			$locator.append( $selectMenu );
@@ -396,6 +403,87 @@ $(function(){
 			infoWindow.close();
 		};
 
+		var createTagsMenu = function(){
+
+			var label,
+				div,
+				option,
+				i, l;
+
+			$.ajax({ 
+				url : baseURL + 'tags/all' 
+			})
+			.done(function(tags){
+
+				//if tags exist
+				if( tags ){
+
+					//create tags menu
+					$tagsMenu = $('<section />', { class: 'sr-select-tags' });
+
+					//create label
+					label = $('<label />').html('Select Tags: ');
+
+					//create div
+					div = $('<div />');
+
+					//append label to select menu
+					$tagsMenu.append( label );
+					$tagsMenu.append( div );
+
+					//create location dropdown
+					$tagsSelect = $('<select />', { 
+						class: 'sr-tags'
+					})
+					.prop('multiple', 'multiple')
+					.attr('data-placeholder', 'Click to Select Tags...');
+
+					//for each tag create an option
+					for(i = 0, l = tags.length; i < l; ++i){
+
+							//create option
+							option = $('<option />', {
+								html: tags[i].name,
+								value: tags[i].id
+							});
+
+							//append option to select element
+							$tagsSelect.append(option);
+					}
+
+					//append select menu to div
+					div.append( $tagsSelect );
+
+					//append select to tags menu
+					$tagsMenu.append( div );
+
+					//bind event
+					$tagsSelect.on('change', tagsChange);
+
+					//append tags menu to container
+					$selectMenu.append( $tagsMenu );
+
+					//initialize chosen plugin
+					$tagsSelect.chosen({ 
+						disable_search_threshold: 10,
+						width: '100%'
+					});
+				}
+			});
+		};	
+
+		var tagsChange = function(){
+
+			//clear reps
+			clearReps();
+
+			//create reps
+			createReps(true);
+
+			//close info window
+			infoWindow.close();
+		};	
+
 		var createReps = function(animate){
 
 			var $rep,
@@ -421,6 +509,12 @@ $(function(){
 
 					//make sure location id matches
 					if( reps[i].location_id != selectedLocation.id ) continue;
+				}
+
+				//if tags are enabled and tags are selected, check for match
+				if( ( options.tags ) && ( $tagsSelect.val().length > 0 ) ){
+
+					if( !matchReps(reps[i]) ) continue;
 				}
 
 				//store location
@@ -532,7 +626,34 @@ $(function(){
 
 			//set markers as empty
 			markers.length = 0;
-		}
+		};
+
+		var matchReps = function(rep){
+
+			var selected,
+				i, l, x, y;
+
+			//get selected tags
+			selected = $tagsSelect.val();
+
+			//rep must have tags
+			if( !rep.tags ) return false;
+
+			//for each selected tag
+			for(i = 0, l = selected.length; i < l; ++i){
+
+				//check for match
+				for(x = 0, y = rep.tags.length; x < y; ++x){
+
+					if( selected[i] === rep.tags[x] ) return true;
+
+					console.log( selected[i] + ' = ' + rep.tags[x] );
+				}
+			}
+
+			//no match
+			return false;
+		};
 
 		var markerClick = function(){
 
@@ -580,7 +701,9 @@ $(function(){
 
 		var parseText = function(rep){
 
-			var $content,
+			var $a,
+				$content,
+				$img,
 				name,
 				company,
 				email,
@@ -611,6 +734,8 @@ $(function(){
 			cell    = ( rep.cell )    ? rep.cell.trim()    : false;
 			fax     = ( rep.fax )     ? rep.fax.trim()     : false;
 			web     = ( rep.web )     ? rep.web.trim()     : false;
+			img     = ( rep.img )     ? rep.img.trim()     : false;
+			file    = ( rep.file )    ? rep.file.trim()    : false;
 
 			//parse text
 			if( name ) 
@@ -631,6 +756,8 @@ $(function(){
 				$content.append( parseFax( fax ) );
 			if( web ) 
 				$content.append( parseWeb( web ) );
+			if( web && img ) 
+				$content.append( parseImg( web, img, file ) );
 
 			return $content;
 		};
@@ -740,10 +867,32 @@ $(function(){
 			var link;
 
 			link = $('<a />',{
-
+				class: 'sr-link',
 				href: web
 			})
 			.html(web);
+
+			return $('<div />').append( link );
+		};
+
+		var parseImg = function(web, img, file){
+
+			var img,
+				link;
+
+			link = $('<a />', { 
+				class: 'sr-img',
+				href: web 
+			});
+
+			if( img ){ //add image
+
+				link.html( $('<img />', { src: baseURL + 'assets/uploads/' + file } ) );
+			}
+			else{ //add web
+
+				link.html( web );
+			}
 
 			return $('<div />').append( link );
 		};

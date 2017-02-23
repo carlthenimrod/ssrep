@@ -212,6 +212,8 @@ $(function(){
 						//store img info
 						$('button#sr-image').html( 'Select Image...' );
 						$('#sr-img').val('');
+
+						$popup.remove();
 					});
 
 					e.preventDefault();

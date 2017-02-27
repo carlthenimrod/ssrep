@@ -81,11 +81,31 @@ $(function(){
 						}
 					}
 
-					//create selectMenu
-					createSelectMenu();
+					//if tags are enabled, get tags first
+					if( options.tags ){
 
-					//create reps
-					createReps();
+						$.ajax({ 
+							url : baseURL + 'tags/all' 
+						})
+						.done(function(result){ 
+
+							tags = result;
+
+							//create selectMenu
+							createSelectMenu();
+
+							//create reps
+							createReps();
+						});
+					}
+					else{
+
+						//create selectMenu
+						createSelectMenu();
+
+						//create reps
+						createReps();
+					}
 
 					//create event for info box
 					$info.on('mouseenter', '.sr-rep', markerBounce);
@@ -410,66 +430,60 @@ $(function(){
 				option,
 				i, l;
 
-			$.ajax({ 
-				url : baseURL + 'tags/all' 
-			})
-			.done(function(tags){
+			//if tags exist
+			if( tags ){
 
-				//if tags exist
-				if( tags ){
+				//create tags menu
+				$tagsMenu = $('<section />', { class: 'sr-select-tags' });
 
-					//create tags menu
-					$tagsMenu = $('<section />', { class: 'sr-select-tags' });
+				//create label
+				label = $('<label />').html('Select Tags: ');
 
-					//create label
-					label = $('<label />').html('Select Tags: ');
+				//create div
+				div = $('<div />');
 
-					//create div
-					div = $('<div />');
+				//append label to select menu
+				$tagsMenu.append( label );
+				$tagsMenu.append( div );
 
-					//append label to select menu
-					$tagsMenu.append( label );
-					$tagsMenu.append( div );
+				//create location dropdown
+				$tagsSelect = $('<select />', { 
+					class: 'sr-tags'
+				})
+				.prop('multiple', 'multiple')
+				.attr('data-placeholder', 'Click to Select Tags...');
 
-					//create location dropdown
-					$tagsSelect = $('<select />', { 
-						class: 'sr-tags'
-					})
-					.prop('multiple', 'multiple')
-					.attr('data-placeholder', 'Click to Select Tags...');
+				//for each tag create an option
+				for(i = 0, l = tags.length; i < l; ++i){
 
-					//for each tag create an option
-					for(i = 0, l = tags.length; i < l; ++i){
+						//create option
+						option = $('<option />', {
+							html: tags[i].name,
+							value: tags[i].id
+						});
 
-							//create option
-							option = $('<option />', {
-								html: tags[i].name,
-								value: tags[i].id
-							});
-
-							//append option to select element
-							$tagsSelect.append(option);
-					}
-
-					//append select menu to div
-					div.append( $tagsSelect );
-
-					//append select to tags menu
-					$tagsMenu.append( div );
-
-					//bind event
-					$tagsSelect.on('change', tagsChange);
-
-					//append tags menu to container
-					$selectMenu.append( $tagsMenu );
-
-					//initialize chosen plugin
-					$tagsSelect.chosen({ 
-						disable_search_threshold: 10,
-						width: '100%'
-					});
+						//append option to select element
+						$tagsSelect.append(option);
 				}
-			});
+
+				//append select menu to div
+				div.append( $tagsSelect );
+
+				//append select to tags menu
+				$tagsMenu.append( div );
+
+				//bind event
+				$tagsSelect.on('change', tagsChange);
+
+				//append tags menu to container
+				$selectMenu.append( $tagsMenu );
+
+				//initialize chosen plugin
+				$tagsSelect.chosen({ 
+					disable_search_threshold: 10,
+					width: '100%'
+				});
+			}
 		};	
 
 		var tagsChange = function(){
@@ -646,8 +660,6 @@ $(function(){
 				for(x = 0, y = rep.tags.length; x < y; ++x){
 
 					if( selected[i] === rep.tags[x] ) return true;
-
-					console.log( selected[i] + ' = ' + rep.tags[x] );
 				}
 			}
 

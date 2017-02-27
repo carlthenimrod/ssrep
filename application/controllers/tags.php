@@ -67,7 +67,7 @@ class Tags extends CI_Controller{
 		if( $this->input->post() ){
 
 			//set rules
-			$this->form_validation->set_rules('name', 'Tag name', 'required|alpha|is_unique[tag.name]');
+			$this->form_validation->set_rules('name', 'Tag name', 'required|is_unique[tag.name]');
 
 			//set messages
 			$this->form_validation->set_message('required', 'Error: Tag Name is required.');
@@ -104,7 +104,7 @@ class Tags extends CI_Controller{
 		if( $this->input->post() ){
 
 			//set rules
-			$this->form_validation->set_rules('name', 'Tag name', 'required|alpha|is_unique[tag.name]');
+			$this->form_validation->set_rules('name', 'Tag name', 'required|is_unique[tag.name]');
 
 				if( $this->form_validation->run() ){
 

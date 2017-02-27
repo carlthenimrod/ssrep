@@ -15,26 +15,30 @@ class Images extends CI_Controller{
 		//get images
 		$images = $this->image->all();
 
-		//move selected image to front of array
-		$i = 0;
+		//if we have images
+		if( $images ){
 
-		foreach($images as $image){
+			//move selected image to front of array
+			$i = 0;
 
-			if( $image->id == $id ){
+			foreach($images as $image){
 
-				$selected = $image;
-				$selected->selected = true;
+				if( $image->id == $id ){
 
-				unset( $images[$i] );
+					$selected = $image;
+					$selected->selected = true;
 
-				array_unshift($images, $selected);
+					unset( $images[$i] );
+
+					array_unshift($images, $selected);
+				}
+				else{
+
+					$image->selected = false;
+				}
+
+				++$i;
 			}
-			else{
-
-				$image->selected = false;
-			}
-
-			++$i;
 		}
 
 		$data = array(

@@ -615,7 +615,6 @@ $(function(){
 
 				//events
 				$('#sr-create form').on('submit', newTag);
-				$('#sr-manage').on('change', '.sr-tag-default', saveTagDefault);
 				$('#sr-manage').on('click', '.sr-edit', editTag);
 				$('#sr-manage').on('click', '.sr-delete', deleteTag);
 			});
@@ -993,7 +992,7 @@ $(function(){
 						}
 
 						//add chosen plugin
-						map.sr.selectGroup = $select.chosen({ width: '180px' });
+						map.sr.selectGroup = $select.chosen({ width: '350px' });
 					});
 
 					//get tags
@@ -1035,7 +1034,7 @@ $(function(){
 						}
 
 						//add chosen plugin
-						map.sr.selectTag = $select.chosen({ width: '180px' });
+						map.sr.selectTag = $select.chosen({ width: '450px' });
 					});
 
 					//create markers

@@ -164,9 +164,14 @@ section#sr-reps-info .sr-rep a{
 section#sr-reps-info .sr-rep a:hover{
 	text-decoration: none;
 }
+section#sr-reps-info .sr-rep a.sr-link{
+	display: none;
+}
 section#sr-reps-info .sr-rep img{
 	cursor: pointer;
-	width: 100%;
+	margin: 10px 0 0 0;
+	max-height: 120px;
+	max-width: 100%;
 }
 
 /***** Admin *****
@@ -324,7 +329,7 @@ section#sr-reps-info .sr-rep img{
 #sr-admin .sr-edit-info .sr-extra .chosen-container-multi .chosen-choices{
 	border: 1px solid #ddd;
 	background: #fafafa;
-	height: 29px;
+	height: 29px !important;
 	line-height: 27px;
 }
 #sr-admin .sr-edit-info .sr-rep-info{

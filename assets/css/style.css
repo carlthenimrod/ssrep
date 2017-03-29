@@ -50,7 +50,6 @@ img{
 #sr-map .sr-rep a.sr-img{
 	display: none;
 }
-}
 
 /*** Locator ***/
 section#sr-locator{
@@ -78,7 +77,7 @@ section#sr-locator .sr-select-menu .sr-select-country{
 section#sr-locator .sr-select-menu .sr-select-location{
 	display: inline-block;
 	margin: 0 0 0 10px;
-	width: 300px;
+	width: 200px;
 }
 section#sr-locator .sr-select-menu .sr-select-location ul li{
 	background-image: none;
@@ -89,13 +88,12 @@ section#sr-locator .sr-select-menu .sr-select-tags{
 	float: right;
 	font-size: 14px;
 	font-style: italic;
-	padding: 0 0 0 100px;
 }
 section#sr-locator .sr-select-menu .sr-select-tags label{
 	display: inline-block;
 	padding: 0 10px 0 0;
 }
-section#sr-locator .sr-select-menu .sr-select-tags div{
+section#sr-locator .sr-select-menu .sr-select-tags > div{
 	display: inline-block;
 	padding: 0 10px 0 0;
 	width: 200px;

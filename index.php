@@ -53,7 +53,14 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
+if( $_SERVER['HTTP_HOST'] == 'ofsoptics.com' || $_SERVER['HTTP_HOST'] == 'www.ofsoptics.com' || $_SERVER['HTTP_HOST'] == 'http://ofsoptics.thomaswebs.net' ){
+	
+	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'production');
+}
+else
+{
 	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+}
 
 /*
  *---------------------------------------------------------------

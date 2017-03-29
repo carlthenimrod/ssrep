@@ -51,11 +51,11 @@ $(function(){
 					locations = data.locations;
 					reps      = data.reps;
 					
-					//create map, center on USA
+					//create map
 					map = new google.maps.Map(document.getElementById("sr-map"), {
 
-						center: new google.maps.LatLng(-38.555474, -63.664999),
-						zoom: 4,
+						center: new google.maps.LatLng(7, 5),
+						zoom: 2,
 						mapTypeId: google.maps.MapTypeId.ROADMAP
 					});
 
@@ -156,6 +156,15 @@ $(function(){
 				//create country dropdown
 				select = $('<select />', { class: 'sr-countries' });
 
+				//create all option
+				option = $('<option />', {
+					html: 'All',
+					value: 'all'
+				});
+
+				//append to select
+				select.append(option);
+
 				//for each country create an option
 				for(i = 0, l = countries.length; i < l; ++i){
 
@@ -165,28 +174,15 @@ $(function(){
 						value: countries[i].id
 					});
 
-					//add as selected if US
-					if( countries[i].short_name === 'US' ){
-
-						option.attr('selected', 'selected');
-
-						selectedCountry = countries[i];
-
-						//make top option
-						select.prepend(option);
-					}
-					else{
-
-						//append option to select element
-						select.append(option);
-					}
+					//append option to select element
+					select.append(option);
 				}
 
 				//if no selected country, select first
 				if( !selectedCountry ){
 
 					//default country
-					selectedCountry = countries[0];
+					selectedCountry = 'all';
 				}
 
 				//bind event
@@ -211,30 +207,29 @@ $(function(){
 			}
 		};
 
+
 		var countryChange = function(){
 
 			var id = $(this).find(':selected').val(),
 				coords,
 				i, l;
 
-			//for each country find selected
-			for(i = 0, l = countries.length; i < l; ++i){
+			if( id ){
 
-				//if match
-				if( countries[i].id === id ){
+				if( id === 'all' ){
 
 					//change selected
-					selectedCountry = countries[i];
+					selectedCountry = 'all';
 
 					//update location menu
 					updateLocationMenu();
 
 					//store coords
-					coords = new google.maps.LatLng(countries[i].lat, countries[i].lng);
+					coords = new google.maps.LatLng(7, 5);
 
 					//update map
 					map.setCenter( coords );
-					map.setZoom( 4 );
+					map.setZoom( 2 );
 
 					//clear reps
 					clearReps();
@@ -244,9 +239,65 @@ $(function(){
 
 					//close info window
 					infoWindow.close();
-
-					break;
 				}
+				else{
+
+					//for each country find selected
+					for(i = 0, l = countries.length; i < l; ++i){
+
+						//if match
+						if( countries[i].id === id ){
+
+							//change selected
+							selectedCountry = countries[i];
+
+							//update location menu
+							updateLocationMenu();
+
+							//store coords
+							coords = new google.maps.LatLng(countries[i].lat, countries[i].lng);
+
+							//update map
+							map.setCenter( coords );
+							map.setZoom( 4 );
+
+							//clear reps
+							clearReps();
+
+							//create reps
+							createReps();
+
+							//close info window
+							infoWindow.close();
+
+							break;
+						}
+					}
+				}
+			}
+			else{
+
+				//change selected
+				selectedCountry = countries[i];
+
+				//update location menu
+				updateLocationMenu();
+
+				//store coords
+				coords = new google.maps.LatLng(7, 5);
+
+				//update map
+				map.setCenter( coords );
+				map.setZoom( 2 );
+
+				//clear reps
+				clearReps();
+
+				//create reps
+				createReps();
+
+				//close info window
+				infoWindow.close();
 			}
 		};
 
@@ -450,8 +501,16 @@ $(function(){
 				$tagsSelect = $('<select />', { 
 					class: 'sr-tags'
 				})
-				.prop('multiple', 'multiple')
 				.attr('data-placeholder', 'Click to Select Tags...');
+
+				//create option
+				option = $('<option />', {
+					html: '--- None ---',
+					value: ''
+				});
+
+				//append option to select element
+				$tagsSelect.append(option);
 
 				//for each tag create an option
 				for(i = 0, l = tags.length; i < l; ++i){
@@ -480,7 +539,6 @@ $(function(){
 
 				//initialize chosen plugin
 				$tagsSelect.chosen({ 
-					disable_search_threshold: 10,
 					width: '100%'
 				});
 			}
@@ -513,7 +571,7 @@ $(function(){
 
 			for(i = 0, l = reps.length; i < l; ++i){
 
-				if( selectedCountry ){ //if country is selected
+				if( ( selectedCountry ) && ( selectedCountry !== 'all') ){ //if country is selected
 
 					//make sure country id matches
 					if( reps[i].country_id != selectedCountry.id ) continue;
@@ -610,11 +668,17 @@ $(function(){
 				//create h2
 				h2 = $('<h2 />');
 
-				//create inner html
-				if( selectedLocation ) html = selectedLocation.long_name + ', ';
-				if( selectedCountry ) html += selectedCountry.long_name + ' - ';
+				if( selectedCountry === 'all' ){
 
-				html += markers.length + ' Located';
+					html = 'Total Reps - ' + markers.length;
+				}
+				else{
+					//create inner html
+					if( selectedLocation ) html = selectedLocation.long_name + ', ';
+					if( selectedCountry ) html += selectedCountry.long_name + ' - ';
+
+					html += markers.length + ' Located';
+				}
 
 				//store html
 				h2.html(html);
@@ -746,8 +810,8 @@ $(function(){
 			cell    = ( rep.cell )    ? rep.cell.trim()    : false;
 			fax     = ( rep.fax )     ? rep.fax.trim()     : false;
 			web     = ( rep.web )     ? rep.web.trim()     : false;
-			img     = ( rep.img )     ? rep.img.trim()     : false;
 			file    = ( rep.file )    ? rep.file.trim()    : false;
+			img     = parseInt(rep.img, 10);
 
 			//parse text
 			if( name ) 
